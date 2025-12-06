@@ -4,62 +4,49 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return Admin::all();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request['password'] = Hash::make($request['password']);
+        $admin = Admin::create($request->all());
+        return response()->json($admin, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Admin $admin)
     {
-        //
+        return $admin;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Admin $admin)
     {
-        //
+        
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Admin $admin)
     {
-        //
+        if ($request->has('password')) {
+            $request['password'] = Hash::make($request['password']);
+        }
+        $admin->update($request->all());
+        return $admin;
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Admin $admin)
     {
-        //
+        $admin->delete();
+        return response()->json(null, 204);
     }
 }
