@@ -1,6 +1,9 @@
 <?php
 use Illuminate\Support\Facades\Route;
 
+Route::post('/admins/login', [AdminController::class, 'login']);
+Route::post('/customers/login', [CustomerController::class, 'login']);
+
 Route::apiResource('products', \App\Http\Controllers\ProductController::class);
 Route::apiResource('admins', \App\Http\Controllers\AdminController::class);
 Route::apiResource('customers', \App\Http\Controllers\CustomerController::class);

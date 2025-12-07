@@ -10,7 +10,7 @@ class CustomerController extends Controller
 {
     public function index()
     {
-        return Customer::all();
+        return Customer::with(['carts.product', 'orders'])->get();
     }
 
     public function create()
@@ -22,12 +22,12 @@ class CustomerController extends Controller
     {
         $request['password'] = Hash::make($request['password']);
         $customer = Customer::create($request->all());
-        return response()->json($customer, 201);
+        return response()->json($customer->load(['carts.product', 'orders']), 201);
     }
 
     public function show(Customer $customer)
     {
-        return $customer;
+        return $customer->load(['carts.product', 'orders']);
     }
 
     public function edit(Customer $customer)
@@ -41,12 +41,32 @@ class CustomerController extends Controller
             $request['password'] = Hash::make($request['password']);
         }
         $customer->update($request->all());
-        return $customer;
+        return $customer->load(['carts.product', 'orders']);
     }
 
     public function destroy(Customer $customer)
     {
         $customer->delete();
         return response()->json(null, 204);
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        $customer = Customer::where('email', $request->email)->first();
+        
+        if ($customer && Hash::check($request->password, $customer->password)) {
+            return response()->json([
+                'message' => 'Login successful',
+                'customer' => $customer,
+                'token' => base64_encode($request->email . ':' . $request->password)
+            ], 200);
+        }
+        
+        return response()->json(['message' => 'Invalid credentials'], 401);
     }
 }

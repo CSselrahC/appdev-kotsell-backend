@@ -9,7 +9,7 @@ class CartController extends Controller
 {
     public function index()
     {
-        return Cart::all();
+        return Cart::with(['customer', 'product'])->get();
     }
 
     public function create()
@@ -20,12 +20,12 @@ class CartController extends Controller
     public function store(Request $request)
     {
         $cart = Cart::create($request->all());
-        return response()->json($cart, 201);
+        return response()->json($cart->load(['customer', 'product']), 201);
     }
 
     public function show(Cart $cart)
     {
-        return $cart;
+        return $cart->load(['customer', 'product']);
     }
 
     public function edit(Cart $cart)
@@ -36,7 +36,7 @@ class CartController extends Controller
     public function update(Request $request, Cart $cart)
     {
         $cart->update($request->all());
-        return $cart;
+        return $cart->load(['customer', 'product']);
     }
 
     public function destroy(Cart $cart)

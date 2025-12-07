@@ -49,4 +49,24 @@ class AdminController extends Controller
         $admin->delete();
         return response()->json(null, 204);
     }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        $admin = Admin::where('email', $request->email)->first();
+        
+        if ($admin && Hash::check($request->password, $admin->password)) {
+            return response()->json([
+                'message' => 'Login successful',
+                'admin' => $admin,
+                'token' => base64_encode($request->email . ':' . $request->password)
+            ], 200);
+        }
+        
+        return response()->json(['message' => 'Invalid credentials'], 401);
+    }
 }

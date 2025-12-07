@@ -14,11 +14,10 @@ class CartFactory extends Factory
     public function definition(): array
     {
         return [
-            'customersId' => Customer::factory(),
-            'productId' => Product::factory(),
+            'customersId' => Customer::inRandomOrder()->first()?->customersId ?? Customer::factory(),
+            'productId' => Product::inRandomOrder()->first()?->productId ?? Product::factory(),
             'quantity' => fake()->numberBetween(1, 10),
             'price' => fake()->randomFloat(2, 100, 1000)
         ];
     }
 }
-

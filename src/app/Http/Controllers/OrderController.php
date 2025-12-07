@@ -9,7 +9,7 @@ class OrderController extends Controller
 {
     public function index()
     {
-        return Order::all();
+        return Order::with('customer')->get();
     }
 
     public function create()
@@ -20,12 +20,12 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $order = Order::create($request->all());
-        return response()->json($order, 201);
+        return response()->json($order->load('customer'), 201);
     }
 
     public function show(Order $order)
     {
-        return $order;
+        return $order->load('customer');
     }
 
     public function edit(Order $order)
@@ -36,7 +36,7 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
         $order->update($request->all());
-        return $order;
+        return $order->load('customer');
     }
 
     public function destroy(Order $order)

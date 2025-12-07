@@ -9,7 +9,7 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        return Category::all();
+        return Category::with('products')->get();
     }
 
     public function create()
@@ -20,12 +20,12 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $category = Category::create($request->all());
-        return response()->json($category, 201);
+        return response()->json($category->load('products'), 201);
     }
 
     public function show(Category $category)
     {
-        return $category;
+        return $category->load('products');
     }
 
     public function edit(Category $category)
@@ -36,7 +36,7 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         $category->update($request->all());
-        return $category;
+        return $category->load('products');
     }
 
     public function destroy(Category $category)

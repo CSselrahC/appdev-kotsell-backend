@@ -25,11 +25,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
+# Copy PHP config
+COPY ./src/php.ini /usr/local/etc/php/conf.d/custom.ini
+
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Verify Composer installation
-RUN /usr/local/bin/composer --version
+RUN composer --version
 
 # Configure Apache for Laravel
 RUN echo '<VirtualHost *:80>' > /etc/apache2/sites-available/000-default.conf \
