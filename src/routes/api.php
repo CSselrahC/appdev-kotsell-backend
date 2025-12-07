@@ -11,4 +11,5 @@ Route::apiResource('categories', \App\Http\Controllers\CategoryController::class
 Route::apiResource('images', \App\Http\Controllers\ImageController::class);
 Route::apiResource('carts', \App\Http\Controllers\CartController::class);
 Route::apiResource('orders', \App\Http\Controllers\OrderController::class);
+Route::apiResource('product_categories', ProductCategoryController::class);
 ?>
