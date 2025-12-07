@@ -9,7 +9,6 @@ class Customer extends Model {
     use HasFactory;
     protected $fillable = ['username', 'email', 'password', 'firstName', 'lastName', 'street', 'barangay', 'city', 'postalCode'];
     protected $primaryKey = 'customersId';
-    protected $hidden = ['password'];
 
     public function carts()
     {

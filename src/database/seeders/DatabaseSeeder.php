@@ -20,8 +20,8 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             ProductSeeder::class,
             ImageSeeder::class,
-            ProductCategorySeeder::class,  // NEW - Link products to categories
-            ProductImageSeeder::class,     // NEW - Link products to images
+            ProductCategorySeeder::class,
+            ProductImageSeeder::class,
             CartSeeder::class,
             OrderSeeder::class
         ]);

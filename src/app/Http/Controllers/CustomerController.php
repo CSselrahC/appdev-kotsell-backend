@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class CustomerController extends Controller
 {
@@ -13,15 +12,9 @@ class CustomerController extends Controller
         return Customer::with(['carts.product', 'orders'])->get();
     }
 
-    public function create()
-    {
-        
-    }
-
     public function store(Request $request)
     {
-        $request['password'] = Hash::make($request['password']);
-        $customer = Customer::create($request->all());
+        $customer = Customer::create($request->all());  // ← NO HASHING
         return response()->json($customer->load(['carts.product', 'orders']), 201);
     }
 
@@ -30,17 +23,9 @@ class CustomerController extends Controller
         return $customer->load(['carts.product', 'orders']);
     }
 
-    public function edit(Customer $customer)
-    {
-        
-    }
-
     public function update(Request $request, Customer $customer)
     {
-        if ($request->has('password')) {
-            $request['password'] = Hash::make($request['password']);
-        }
-        $customer->update($request->all());
+        $customer->update($request->all());  // ← NO HASHING
         return $customer->load(['carts.product', 'orders']);
     }
 
@@ -57,9 +42,11 @@ class CustomerController extends Controller
             'password' => 'required'
         ]);
 
-        $customer = Customer::where('email', $request->email)->first();
+        $customer = Customer::where('email', $request->email)
+                           ->where('password', $request->password)  // ← PLAINTEXT CHECK
+                           ->first();
         
-        if ($customer && Hash::check($request->password, $customer->password)) {
+        if ($customer) {
             return response()->json([
                 'message' => 'Login successful',
                 'customer' => $customer,

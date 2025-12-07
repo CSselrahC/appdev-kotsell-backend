@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
@@ -13,15 +12,9 @@ class AdminController extends Controller
         return Admin::all();
     }
 
-    public function create()
-    {
-        
-    }
-
     public function store(Request $request)
     {
-        $request['password'] = Hash::make($request['password']);
-        $admin = Admin::create($request->all());
+        $admin = Admin::create($request->all());  // ← NO HASHING
         return response()->json($admin, 201);
     }
 
@@ -30,17 +23,9 @@ class AdminController extends Controller
         return $admin;
     }
 
-    public function edit(Admin $admin)
-    {
-        
-    }
-
     public function update(Request $request, Admin $admin)
     {
-        if ($request->has('password')) {
-            $request['password'] = Hash::make($request['password']);
-        }
-        $admin->update($request->all());
+        $admin->update($request->all());  // ← NO HASHING
         return $admin;
     }
 
@@ -57,9 +42,11 @@ class AdminController extends Controller
             'password' => 'required'
         ]);
 
-        $admin = Admin::where('email', $request->email)->first();
+        $admin = Admin::where('email', $request->email)
+                     ->where('password', $request->password)  // ← PLAINTEXT CHECK
+                     ->first();
         
-        if ($admin && Hash::check($request->password, $admin->password)) {
+        if ($admin) {
             return response()->json([
                 'message' => 'Login successful',
                 'admin' => $admin,

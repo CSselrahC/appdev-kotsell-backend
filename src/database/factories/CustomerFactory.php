@@ -15,7 +15,7 @@ class CustomerFactory extends Factory
         return [
             'username' => fake()->unique()->userName(),
             'email' => fake()->unique()->safeEmail(),
-            'password' => Hash::make('password'),
+            'password' => 'password',
             'firstName' => fake()->firstName(),
             'lastName' => fake()->lastName(),
             'street' => fake()->streetAddress(),
