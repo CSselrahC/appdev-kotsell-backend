@@ -7,59 +7,53 @@ use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return Customer::with(['carts.product', 'orders'])->get();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $customer = Customer::create($request->all());  // ← NO HASHING
+        return response()->json($customer->load(['carts.product', 'orders']), 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Customer $customer)
     {
-        //
+        return $customer->load(['carts.product', 'orders']);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Customer $customer)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Customer $customer)
     {
-        //
+        $customer->update($request->all());  // ← NO HASHING
+        return $customer->load(['carts.product', 'orders']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Customer $customer)
     {
-        //
+        $customer->delete();
+        return response()->json(null, 204);
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        $customer = Customer::where('email', $request->email)
+                           ->where('password', $request->password)  // ← PLAINTEXT CHECK
+                           ->first();
+        
+        if ($customer) {
+            return response()->json([
+                'message' => 'Login successful',
+                'customer' => $customer,
+                'token' => base64_encode($request->email . ':' . $request->password)
+            ], 200);
+        }
+        
+        return response()->json(['message' => 'Invalid credentials'], 401);
     }
 }

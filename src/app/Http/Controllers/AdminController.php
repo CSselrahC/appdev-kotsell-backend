@@ -7,59 +7,53 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return Admin::all();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $admin = Admin::create($request->all());  // ← NO HASHING
+        return response()->json($admin, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Admin $admin)
     {
-        //
+        return $admin;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Admin $admin)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Admin $admin)
     {
-        //
+        $admin->update($request->all());  // ← NO HASHING
+        return $admin;
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Admin $admin)
     {
-        //
+        $admin->delete();
+        return response()->json(null, 204);
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        $admin = Admin::where('email', $request->email)
+                     ->where('password', $request->password)  // ← PLAINTEXT CHECK
+                     ->first();
+        
+        if ($admin) {
+            return response()->json([
+                'message' => 'Login successful',
+                'admin' => $admin,
+                'token' => base64_encode($request->email . ':' . $request->password)
+            ], 200);
+        }
+        
+        return response()->json(['message' => 'Invalid credentials'], 401);
     }
 }

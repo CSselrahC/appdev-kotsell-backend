@@ -9,5 +9,9 @@ class Order extends Model {
     use HasFactory;
     protected $fillable = ['customersId', 'totalPrice', 'paymentMethod', 'deliveryAddress', 'purchaseDate'];
     protected $primaryKey = 'orderNumber';
-}
 
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customersId');
+    }
+}

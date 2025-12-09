@@ -1,65 +1,75 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Product;
+use App\Models\Image;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return Product::with('images')->get();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:3072'
+        ]);
+
+        $product = Product::create($request->only(['name', 'description', 'price', 'stock']));
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $imageFile) {
+                $path = $imageFile->store('products', 'public');
+                $image = Image::create([
+                    'name' => $imageFile->getClientOriginalName(),
+                    'source' => $path,
+                    'productId' => $product->productId
+                ]);
+                ProductImage::create([
+                    'productId' => $product->productId,
+                    'imageId' => $image->imageId
+                ]);
+            }
+        }
+
+        return response()->json($product->load('images'), 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Product $product)
     {
-        //
+        return $product->load('images');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Product $product)
     {
-        //
+        
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Product $product)
     {
-        //
+        $product->update($request->only(['name', 'description', 'price', 'stock']));
+        return $product->load('images');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Product $product)
     {
-        //
+        foreach ($product->images as $image) {
+            Storage::disk('public')->delete($image->source);
+        }
+        $product->delete();
+        return response()->json(null, 204);
     }
 }

@@ -9,5 +9,14 @@ class Customer extends Model {
     use HasFactory;
     protected $fillable = ['username', 'email', 'password', 'firstName', 'lastName', 'street', 'barangay', 'city', 'postalCode'];
     protected $primaryKey = 'customersId';
-}
 
+    public function carts()
+    {
+        return $this->hasMany(Cart::class, 'customersId');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'customersId');
+    }
+}

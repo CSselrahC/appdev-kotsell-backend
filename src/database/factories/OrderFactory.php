@@ -13,7 +13,7 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'customersId' => Customer::factory(),
+            'customersId' => Customer::inRandomOrder()->first()?->customersId ?? Customer::factory(),
             'totalPrice' => fake()->randomFloat(2, 500, 50000),
             'paymentMethod' => fake()->randomElement(['Credit Card', 'Debit Card', 'Cash on Delivery']),
             'deliveryAddress' => fake()->address(),
@@ -21,4 +21,3 @@ class OrderFactory extends Factory
         ];
     }
 }
-
