@@ -1,3 +1,6 @@
+# The link for the front-end source code of the e-commerce:
+https://github.com/CSselrahC/kotsell-frontend
+
 # 1. Start services & build
 docker-compose up -d --build
 wait for about 90 seconds
